@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaFlow | Smart Water Management</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+             --primary: #0ea5e9;
+             --primary-dark: #0284c7;
+             --bg-gradient-start: #f0f9ff;
+             --bg-gradient-end: #e0f2fe;
+             --text-main: #0f172a;
+             --text-muted: #64748B;
+             --card-bg: #ffffff;
+             --danger: #ef4444;
+             --success: #22c55e;
+             --warning: #f97316;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Section Headings */
+        .section-header {
+            margin-bottom: 24px;
+        }
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Status Banner */
+        .status-banner {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .status-banner.leak-active {
+            background: #fef2f2;
+            border-color: #fecaca;
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .status-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-neutral { background: #f1f5f9; color: #475569; }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0.5;
+        }
+
+        .card.risk::before { background: var(--warning); }
+        .card.cost::before { background: var(--success); }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f0f9ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card .unit {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Simulation Controls (Hidden by default or subtle) */
+        .simulation-hint {
+            margin-top: 40px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px dashed #cbd5e1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; }
+            .container { margin: 20px auto; }
+            .status-info h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-droplet"></i>
+            </div>
+            <span>AquaFlow</span>
+        </div>
+        <div class="user-profile">
+            <span>My Home Dashboard</span>
+            <div class="avatar">
+                <i class="fa-solid fa-house-user"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Welcome Header -->
+        <div class="section-header">
+            <h2>My Water Usage</h2>
+            <p>Monitor your home's water flow and consumption in real-time.</p>
+        </div>
+
+        <!-- Main Status Banner -->
+        <div id="statusBanner" class="status-banner">
+            <div class="status-info">
+                <h3>System Status</h3>
+                <h1 id="statusText">System Normal</h1>
+                <div id="statusBadge" class="status-badge badge-neutral">
+                    <i class="fa-solid fa-check"></i> Standard Operation
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <p style="color:var(--text-muted); font-size:0.9rem;">Start Time</p>
+                <h3 id="startTime" style="font-size:1.1rem;">--:--</h3>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="dashboard-grid">
+
+            <!-- Flow Rate -->
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fa-solid fa-wind"></i>
+                </div>
+                <h3>Current Flow Rate</h3>
+                <div class="value">
+                    <span id="flowRate">0.00</span>
+                    <span class="unit">L/min</span>
+                </div>
+            </div>
+
+            <!-- Total Usage -->
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fa-solid fa-faucet"></i>
+                </div>
+                <h3>Total Usage</h3>
+                <div class="value">
+                    <span id="totalUsage">0.000</span>
+                    <span class="unit">L</span>
+                </div>
+            </div>
+
+            <!-- Estimated Cost -->
+            <div class="card cost">
+                <div class="card-icon" style="background: #dcfce7; color: #166534;">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <h3>Estimated Cost</h3>
+                <div class="value">
+                    <span id="estCost">0.00</span>
+                    <span class="unit">RWF</span>
+                </div>
+            </div>
+
+            <!-- Leak/Risk Metrics -->
+            <div class="card risk">
+                <div class="card-icon" style="background: #fff7ed; color: #c2410c;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3>Leak Duration</h3>
+                <div class="value">
+                    <span id="leakDuration">0</span>
+                    <span class="unit">sec</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-container">
+            <div class="section-header">
+                <h2>Live Flow Analytics</h2>
+                <p>Real-time water flow data visualization (10s window).</p>
+            </div>
+            <canvas id="flowChart" style="width: 100%; height: 200px;"></canvas>
+        </div>
+    </div>
+    <script>
+        // --- Chart Configuration ---
+        const ctx = document.getElementById('flowChart').getContext('2d');
+        const MAX_POINTS = 60; // 1 minute window
+
+        // precise initial data
+        const initialData = new Array(MAX_POINTS).fill(0);
+        const initialLabels = new Array(MAX_POINTS).fill('');
+        initialLabels[MAX_POINTS-1] = 'Now';
+        initialLabels[0] = '60s ago';
+
+        const flowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: initialLabels,
+                datasets: [{
+                    label: 'Flow (L/min)',
+                    data: initialData,
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.15)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1, // Less wobbly
+                    pointRadius: 0, // Clean line only
+                    pointHoverRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // DISABLE ALL ANIMATION for "static" feel
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5, // Fixed max scale to prevent auto-expansion
+                        grid: {
+                            display: true,
+                            color: '#f1f5f9'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: true,
+                            drawOnChartArea: false // Only ticks
+                        },
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 0,
+                            callback: function(val, index) {
+                                // Only show first and last label
+                                return (index === 0 || index === MAX_POINTS - 1) ? this.getLabelForValue(val) : '';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                }
+            }
+        });
+
+        // --- Data Fetching ---
+        function updateDashboard() {
+            fetch("/api/data")
+                .then(res => res.json())
+                .then(data => {
+
+                    // 1. Digital Values
+                    document.getElementById("flowRate").innerText = data.flow_l_min.toFixed(2);
+                    document.getElementById("totalUsage").innerText = data.total_l.toFixed(3);
+                    document.getElementById("estCost").innerText = data.estimated_cost.toFixed(2);
+                    document.getElementById("leakDuration").innerText = data.leak_duration;
+
+                    // 2. Status Banner Logic
+                    const banner = document.getElementById("statusBanner");
+                    const statusText = document.getElementById("statusText");
+                    const badge = document.getElementById("statusBadge");
+
+                    if (data.leak) {
+                        banner.className = "status-banner leak-active";
+                        statusText.innerText = "⚠ Leak Detected!";
+                        statusText.style.color = "#991b1b";
+                        badge.className = "status-badge badge-danger";
+                        badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ACTION REQUIRED';
+                    } else if (data.water_status === "FLOWING") {
+                        banner.className = "status-banner";
+                        statusText.innerText = "Water is Flowing";
+                        statusText.style.color = "#166534";
+                        badge.className = "status-badge badge-success";
+                        badge.innerHTML = '<i class="fa-solid fa-faucet"></i> ACTIVE SUPPLY';
+                    } else {
+                        banner.className = "status-banner";
+                        statusText.innerText = "System Idle";
+                        statusText.style.color = "#0f172a";
+                        badge.className = "status-badge badge-neutral";
+                        badge.innerHTML = '<i class="fa-solid fa-check"></i> STANDBY';
+                    }
+
+                    // 3. Update Chart (Rolling Window)
+                    const flows = flowChart.data.datasets[0].data;
+
+                    // Shift left: remove first, add new at end
+                    flows.shift();
+                    flows.push(data.flow_l_min);
+
+                    // Use 'none' mode for zero animation latency
+                    flowChart.update('none');
+
+                    // 4. Time
+                    if (data.session_start) {
+                         const date = new Date(data.session_start * 1000);
+                         document.getElementById("startTime").innerText = date.toLocaleTimeString();
+                    } else {
+                        document.getElementById("startTime").innerText = "--:--";
+                    }
+
+                })
+                .catch(err => console.error("API Error:", err));
+        }
+
+        // Run every 1 second
+        setInterval(updateDashboard, 1000);
+        updateDashboard();
+
+    </script>
+</body>
+</html>
