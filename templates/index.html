@@ -357,7 +357,7 @@
                 <h2>Live Flow Analytics</h2>
                 <p>Real-time water flow data visualization (10s window).</p>
             </div>
-            <canvas id="flowChart" style="width: 100%; height: 200px;"></canvas>
+            <canvas id="flowChart" style="width: 100%; height: auto;"></canvas>
         </div>
     </div>
     <script>
@@ -389,7 +389,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 animation: false, // DISABLE ALL ANIMATION for "static" feel
                 interaction: {
                     intersect: false,
@@ -397,17 +397,11 @@
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        max: 5, // Fixed max scale to prevent auto-expansion
-                        grid: {
-                            display: true,
-                            color: '#f1f5f9'
-                        }
+                        display: false
                     },
                     x: {
                         grid: {
-                            display: true,
-                            drawOnChartArea: false // Only ticks
+                            display: false
                         },
                         ticks: {
                             autoSkip: false,
