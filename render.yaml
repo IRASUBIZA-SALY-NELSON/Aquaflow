@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: aquaflow-backend
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "pip install -r requirements-backend.txt"
+    startCommand: "python -m backend.app"
+    envVars:
+      - key: AQUAFLOW_MODE
+        value: wifi
+      - key: AQUAFLOW_PORT
+        value: 10000
+      - key: AQUAFLOW_HOST
+        value: 0.0.0.0
+      - key: AQUAFLOW_SIMULATE
+        value: 1
+      - key: PYTHON_VERSION
+        value: 3.11.0
