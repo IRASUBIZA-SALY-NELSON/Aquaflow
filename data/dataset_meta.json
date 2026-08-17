@@ -1,0 +1,19 @@
+{
+  "labels": [
+    "IDLE",
+    "NORMAL_USE",
+    "MID_PIPE_LEAK",
+    "BURST",
+    "CONTINUOUS_FLOW"
+  ],
+  "seq_len": 30,
+  "features": 2,
+  "samples": 2000,
+  "class_counts": {
+    "IDLE": 400,
+    "NORMAL_USE": 400,
+    "MID_PIPE_LEAK": 400,
+    "BURST": 400,
+    "CONTINUOUS_FLOW": 400
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "labels": [
+    "IDLE",
+    "NORMAL_USE",
+    "MID_PIPE_LEAK",
+    "BURST",
+    "CONTINUOUS_FLOW"
+  ]
+}

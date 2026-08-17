@@ -1,0 +1,11 @@
+.venv/
+.tmp-venv/
+.tmp-slides/
+.tmp-pptx/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+data/*.npy
+ai/models/*.keras
+ai/models/*.history.json
