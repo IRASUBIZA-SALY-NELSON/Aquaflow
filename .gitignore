@@ -4,8 +4,13 @@
 .tmp-pptx/
 __pycache__/
 *.pyc
-.env
 .DS_Store
 data/*.npy
 ai/models/*.keras
 ai/models/*.history.json
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
+config.bat
+node_modules
